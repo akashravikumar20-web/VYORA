@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wce
+      POSTGRES_USER: wce
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports: ["5432:5432"]
+    volumes: ["wce_data:/var/lib/postgresql/data"]
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://wce:${POSTGRES_PASSWORD}@db:5432/wce
+    ports: ["3000:3000"]
+    depends_on: [db]
+volumes:
+  wce_data:
